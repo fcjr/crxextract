@@ -19,21 +19,21 @@
 		const header = getCrxHeader(data)
 		const blob = new Blob([data.slice(header.length + 12)], {type: "text/plain;charset=utf-8"})
 		FileSaver.saveAs(blob, name + '.zip')
-  	}
+	}
 
 	function processXpi(name: string, data: ArrayBuffer) {
 		const blob = new Blob([data], {type: "text/plain;charset=utf-8"})
 		FileSaver.saveAs(blob, name + '.zip')
-  	}
+	}
 
 	function handleFilesSelect(e: any) {
-    	const files = e.detail.acceptedFiles
-    	for (let i = 0; i < files.length; i++) {
+		const files = e.detail.acceptedFiles
+		for (let i = 0; i < files.length; i++) {
 			const name = files[i].name.slice(0, -4)
 			const type = files[i].name.slice(-3)
-      		const reader = new FileReader()
-      		reader.onload = () => {
-        		const buf = reader.result as ArrayBuffer
+			const reader = new FileReader()
+			reader.onload = () => {
+				const buf = reader.result as ArrayBuffer
 				if (type === 'xpi') {
 					processXpi(name, buf)
 				} else {
@@ -41,7 +41,7 @@
 				}
 			}
 			reader.readAsArrayBuffer(files[i])
-    	}
+		}
   	}
 </script>
 
