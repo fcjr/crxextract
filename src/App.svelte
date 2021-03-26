@@ -53,7 +53,7 @@
 		accept=".crx,.xpi"
 		containerStyles='height: 100%; justify-content: center;'
 	>
-	<p>Drop a .crx or .xpi here to extract</p>
+		<p>Drop a .crx or .xpi here to extract</p>
 	</Dropzone>
 	<p>You're welcome Teresa =)</p>
 </main>
