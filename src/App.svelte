@@ -1,6 +1,7 @@
 <script type='ts'>
 	import Dropzone from "svelte-file-dropzone"
 	import FileSaver from "file-saver"
+	import StreamSaver from 'streamsaver'
 	import GithubBanner from "./components/GithubBanner.svelte"
 
 	function uint32FromUint8Array(data: Uint8Array) {
@@ -48,6 +49,60 @@
 			reader.readAsArrayBuffer(file)
 		}
 	}
+
+	async function getExtensionInfoFromUrl(rawUrl: string) {
+		var url
+		try {
+			url = new URL(rawUrl);
+		} catch(e) {
+			throw new Error("not a valid url")
+		}
+
+		var path = url.pathname;
+		if (path.slice(-1) == '/') {
+			path = path.slice(0, -1)
+		}
+		const pathParts = path.split('/')
+
+		if (url.hostname === 'chrome.google.com') {
+			return { type: 'chrome', id: pathParts.pop() }
+		} else if (url.hostname === 'addons.mozilla.org') {
+			return { type: 'mozilla', id: pathParts.pop() }
+		}
+		throw new Error('not a valid chrome or mozilla store link')
+  }
+
+	async function processUrl(rawUrl: string) {
+		const eInfo = await getExtensionInfoFromUrl(rawUrl)
+		if (eInfo.type === 'chrome') {
+			const resp = await fetch(`api/getcrx?id=${encodeURIComponent(eInfo.id)}`)
+			const blob = await resp.arrayBuffer()
+			processCrx(eInfo.id, new Uint8Array(blob))
+		} else if (eInfo.type === 'mozilla') {
+			const resp = await fetch(`api/getxpi?url=${encodeURIComponent(rawUrl)}`)
+			if (resp.status === 200) {
+				const fileStream = StreamSaver.createWriteStream(eInfo.id + '.zip', { size: resp.headers.get('content-length') })
+				resp.body.pipeTo(fileStream)
+			} else {
+				throw Error('not a valid addon url')
+			}
+		}
+	}
+
+	var urlInputError = ''
+	async function handleUrlInput(e: Event & { currentTarget: EventTarget & HTMLInputElement }) {
+		const input = e.currentTarget.value;
+		if (input === '') {
+			urlInputError = ''
+			return
+		}
+		try {
+			await processUrl(input)
+		} catch(e) {
+			urlInputError = e.message
+		}
+	}
+
 </script>
 
 <main>
@@ -61,6 +116,14 @@
 	>
 		<p>Drop a .crx or .xpi here to extract</p>
 	</Dropzone>
+	<p>... or paste a <a aria-label='Google Chrome Extension Store' href='https://chrome.google.com/webstore/category/extensions'>Chrome Store</a> / <a aria-label='Mozilla Addon Store' href='https://addons.mozilla.org/firefox/'>Mozilla Addon Store</a> address below:</p>
+	<input
+		class={ urlInputError ? 'urlInput error' : 'urlInput'}
+		placeholder="Paste a store url here to extract"
+		on:input={handleUrlInput}
+		on:change={() => {}}
+	/>
+	<p class="urlInputError">{urlInputError}</p>
 	<div class="footer">
 		<a href="https://frankchiarulli.com/">
 			Made with 💖 by <b>fcjr</b>
@@ -79,11 +142,47 @@
 		text-align: center;
 	}
 
+	a,
+	a:visited {
+		color: inherit;
+	}
+
 	h1 {
 		color: #ff3e00;
 		text-transform: uppercase;
 		font-size: 2em;
 		font-weight: 100;
+	}
+
+	.urlInput {
+		width: 50%;
+		padding: .8em;
+		border: solid;
+		border-width: .2em;
+		border-radius: 1em;
+		border-color: #8d8d8d;
+		-moz-outline-radius: 1em;
+
+	}
+	.urlInput.error:focus {
+			border-color: #ff3e00;
+	}
+
+	.urlInput:focus {
+		outline: none;
+		border-color: #2196f3;
+	}
+	.urlInputError {
+		margin: 0;
+		margin-top: .8em;
+		font-size: .8em;
+		color: #ff3e00;
+		text-align: center;
+	}
+	.urlInputError:before,
+	.urlInputError:after {
+		content: '.';
+		visibility: hidden;
 	}
 
 	.footer {
@@ -95,7 +194,7 @@
 	.footer a {
 		top: 0;
 		position: relative;
-		padding-top: 2em;
+		padding-top: 1em;
 		color: #3b3b3b;
 		text-decoration: none;
 		transition: top ease 0.5s;
