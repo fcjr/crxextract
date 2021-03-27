@@ -76,8 +76,12 @@
 		const eInfo = await getExtensionInfoFromUrl(rawUrl)
 		if (eInfo.type === 'chrome') {
 			const resp = await fetch(`api/getcrx?id=${encodeURIComponent(eInfo.id)}`)
-			const blob = await resp.arrayBuffer()
-			processCrx(eInfo.id, new Uint8Array(blob))
+			if (resp.status === 200) {
+				const blob = await resp.arrayBuffer()
+				processCrx(eInfo.id, new Uint8Array(blob))
+			} else {
+				throw Error('not a valid extension url')
+			}
 		} else if (eInfo.type === 'mozilla') {
 			const resp = await fetch(`api/getxpi?url=${encodeURIComponent(rawUrl)}`)
 			if (resp.status === 200) {
