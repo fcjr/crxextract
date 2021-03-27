@@ -18,6 +18,10 @@
 
 	function processCrx(name: string, data: Uint8Array) {
 		const header = getCrxHeader(data)
+		if (header.version !== 3) {
+			alert(`Only crx version 3 is supported, found a crx version ${header.version}.`);
+			return
+		}
 		const blob = new Blob([data.slice(header.length + 12)], {type: "text/plain;charset=utf-8"})
 		FileSaver.saveAs(blob, name + '.zip')
 	}
@@ -89,11 +93,11 @@
 	}
 
 	.footer a {
+		top: 0;
 		position: relative;
 		padding-top: 2em;
 		color: #3b3b3b;
 		text-decoration: none;
-		top: 0;
 		transition: top ease 0.5s;
 	}
 
