@@ -1,6 +1,12 @@
 {
-    "routes": [{
-        "src": "/api/(.*)",
-        "dest": "api/index.go"
-    }]
+    "routes": [
+		{
+			"src": "/api/getcrx",
+			"dest": "api/index.go"
+		},
+		{
+			"src": "/api/getxpi",
+			"dest": "api/index.go"
+		}
+	]
 }
