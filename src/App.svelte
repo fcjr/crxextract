@@ -58,7 +58,7 @@
 		<p>Drop a .crx or .xpi here to extract</p>
 	</Dropzone>
 	<div class="footer">
-		<a href="https://frankchiarulli.com/" target="_blank">
+		<a href="https://frankchiarulli.com/">
 			Made with 💖 by <b>fcjr</b>
 		</a>
 	</div>
