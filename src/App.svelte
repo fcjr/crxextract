@@ -33,9 +33,9 @@
 
 	function handleFilesSelect(e: any) {
 		const files = e.detail.acceptedFiles
-		for (let i = 0; i < files.length; i++) {
-			const name = files[i].name.slice(0, -4)
-			const type = files[i].name.slice(-3)
+		for (const file of files) {
+			const name = file.name.slice(0, -4)
+			const type = file.name.slice(-3)
 			const reader = new FileReader()
 			reader.onload = () => {
 				const buf = reader.result as ArrayBuffer
@@ -45,7 +45,7 @@
 					processCrx(name, new Uint8Array(buf))
 				}
 			}
-			reader.readAsArrayBuffer(files[i])
+			reader.readAsArrayBuffer(file)
 		}
 	}
 </script>
