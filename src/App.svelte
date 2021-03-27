@@ -1,6 +1,7 @@
 <script type='ts'>
 	import Dropzone from "svelte-file-dropzone"
 	import FileSaver from "file-saver"
+	import GithubBanner from "./components/GithubBanner.svelte"
 
 	function uint32FromUint8Array(data: Uint8Array) {
 		let dataview = new DataView(data.buffer)
@@ -12,7 +13,7 @@
 		const magic = decoder.decode(data.slice(0, 4))
 		const version = uint32FromUint8Array(data.slice(4, 8))
 		const length = uint32FromUint8Array(data.slice(8, 12))
-		return { magic, version, length } 
+		return { magic, version, length }
 	}
 
 	function processCrx(name: string, data: Uint8Array) {
@@ -42,29 +43,36 @@
 			}
 			reader.readAsArrayBuffer(files[i])
 		}
-  	}
+	}
 </script>
 
 <main>
+	<GithubBanner url="https://github.com/fcjr/crxextract" />
 	<h1>Drop a .crx or .xpi below to extract</h1>
-	<Dropzone 
+	<Dropzone
 		on:drop={handleFilesSelect}
 		multiple={false}
 		accept=".crx,.xpi"
-		containerStyles='height: 100%; justify-content: center;'
+		containerStyles='height: 100%; width: 100%; justify-content: center;'
 	>
 		<p>Drop a .crx or .xpi here to extract</p>
 	</Dropzone>
-	<p>You're welcome Teresa =)</p>
+	<div class="footer">
+		<a href="https://frankchiarulli.com/" target="_blank">
+			Made with 💖 by <b>fcjr</b>
+		</a>
+	</div>
 </main>
 
 <style>
 	main {
-		width: 65%;
-		height: 65%;
+		height: 95%;
+		margin: 0 10% 0 10%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
 		text-align: center;
-		padding: 1em;
-		margin: 0 auto;
 	}
 
 	h1 {
@@ -72,5 +80,27 @@
 		text-transform: uppercase;
 		font-size: 2em;
 		font-weight: 100;
+	}
+
+	.footer {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.footer a {
+		position: relative;
+		padding-top: 2em;
+		color: #3b3b3b;
+		text-decoration: none;
+		top: 0;
+		transition: top ease 0.5s;
+	}
+
+	.footer a:hover,
+	.footer a:focus,
+	.footer a:active {
+		top: -5px;
+		text-decoration: underline;
 	}
 </style>
