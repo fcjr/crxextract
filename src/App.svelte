@@ -1,7 +1,7 @@
 <script type='ts'>
 	import Dropzone from "svelte-file-dropzone"
 	import FileSaver from "file-saver"
-	import StreamSaver from 'streamsaver'
+
 	import GithubBanner from "./components/GithubBanner.svelte"
 
 	function uint32FromUint8Array(data: Uint8Array) {
@@ -85,8 +85,7 @@
 		} else if (eInfo.type === 'mozilla') {
 			const resp = await fetch(`api/getxpi?url=${encodeURIComponent(rawUrl)}`)
 			if (resp.status === 200) {
-				const fileStream = StreamSaver.createWriteStream(eInfo.id + '.zip', { size: resp.headers.get('content-length') })
-				resp.body.pipeTo(fileStream)
+				processXpi(eInfo.id, await resp.arrayBuffer())
 			} else {
 				throw Error('not a valid addon url')
 			}
@@ -96,8 +95,8 @@
 	var urlInputError = ''
 	async function handleUrlInput(e: Event & { currentTarget: EventTarget & HTMLInputElement }) {
 		const input = e.currentTarget.value;
+		urlInputError = ''
 		if (input === '') {
-			urlInputError = ''
 			return
 		}
 		try {

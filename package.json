@@ -29,7 +29,6 @@
   "dependencies": {
     "file-saver": "^2.0.5",
     "sirv-cli": "^1.0.0",
-    "streamsaver": "^2.0.5",
     "svelte-file-dropzone": "^0.0.15"
   }
 }
