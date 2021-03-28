@@ -4,12 +4,13 @@
   functions = "functions"
   publish = "public"
 
-[[plugins]]
-  package = "@netlify/plugin-functions-install-core"
+  [[plugins]]
+    package = "@netlify/plugin-functions-install-core"
 
-  ## Uncomment to use this redirect for Single Page Applications like create-react-app.
-  ## Not needed for static site generators.
-  #[[redirects]]
+  [[redirects]]
+    from = "/api/*"
+    to = "/.netlify/functions/:splat"
+    status = 200
   #  from = "/*"
   #  to = "/index.html"
   #  status = 200

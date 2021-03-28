@@ -75,7 +75,7 @@
 	async function processUrl(rawUrl: string) {
 		const eInfo = await getExtensionInfoFromUrl(rawUrl)
 		if (eInfo.type === 'chrome') {
-			const resp = await fetch(`/.netlify/functions/getcrx?id=${encodeURIComponent(eInfo.id)}`)
+			const resp = await fetch(`/api/getcrx?id=${encodeURIComponent(eInfo.id)}`)
 			if (!resp.ok) {
 				const msg = await resp.text()
 				throw new Error(msg)
@@ -83,7 +83,7 @@
 			const blob = await resp.arrayBuffer()
 			processCrx(eInfo.id, new Uint8Array(blob))
 		} else if (eInfo.type === 'mozilla') {
-			const resp = await fetch(`/.netlify/functions/getxpi?url=${encodeURIComponent(rawUrl)}`)
+			const resp = await fetch(`/api/getxpi?url=${encodeURIComponent(rawUrl)}`)
 			if (!resp.ok) {
 				const msg = await resp.text()
 				throw new Error(msg)
