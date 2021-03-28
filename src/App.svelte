@@ -1,8 +1,11 @@
 <script type='ts'>
-	import Dropzone from "svelte-file-dropzone"
-	import FileSaver from "file-saver"
+	import Dropzone from 'svelte-file-dropzone'
+	import FileSaver from 'file-saver'
 
-	import GithubBanner from "./components/GithubBanner.svelte"
+	import getCrxUrl from './utils/getCrxUrl'
+	import getXpiUrl from './utils/getXpiUrl'
+
+	import GithubBanner from './components/GithubBanner.svelte'
 
 	function uint32FromUint8Array(data: Uint8Array) {
 		let dataview = new DataView(data.buffer)
@@ -23,12 +26,12 @@
 			alert(`Only crx version 3 is supported, found a crx version ${header.version}.`)
 			return
 		}
-		const blob = new Blob([data.slice(header.length + 12)], {type: "text/plain;charset=utf-8"})
+		const blob = new Blob([data.slice(header.length + 12)], {type: 'text/plain;charset=utf-8'})
 		FileSaver.saveAs(blob, name + '.zip')
 	}
 
 	function processXpi(name: string, data: ArrayBuffer) {
-		const blob = new Blob([data], {type: "text/plain;charset=utf-8"})
+		const blob = new Blob([data], {type: 'text/plain;charset=utf-8'})
 		FileSaver.saveAs(blob, name + '.zip')
 	}
 
@@ -55,7 +58,7 @@
 		try {
 			url = new URL(rawUrl);
 		} catch(e) {
-			throw new Error("not a valid url")
+			throw new Error('not a valid url')
 		}
 
 		var path = url.pathname;
@@ -70,37 +73,29 @@
 			return { type: 'mozilla', id: pathParts.pop() }
 		}
 		throw new Error('not a valid chrome or mozilla store link')
-  }
+	}
 
 	async function processUrl(rawUrl: string) {
 		const eInfo = await getExtensionInfoFromUrl(rawUrl)
 		if (eInfo.type === 'chrome') {
-			const resp = await fetch(`/api/getcrx?id=${encodeURIComponent(eInfo.id)}`)
-			if (!resp.ok) {
-				const msg = await resp.text()
-				throw new Error(msg)
-			}
-			const blob = await resp.arrayBuffer()
-			processCrx(eInfo.id, new Uint8Array(blob))
+			return getCrxUrl(eInfo.id)
 		} else if (eInfo.type === 'mozilla') {
-			const resp = await fetch(`/api/getxpi?url=${encodeURIComponent(rawUrl)}`)
-			if (!resp.ok) {
-				const msg = await resp.text()
-				throw new Error(msg)
-			}
-			processXpi(eInfo.id, await resp.arrayBuffer())
+			return await getXpiUrl(rawUrl, eInfo.id)
 		}
+		return ''
 	}
 
 	var urlInputError = ''
+	var dlUrl = ''
 	async function handleUrlInput(e: Event & { currentTarget: EventTarget & HTMLInputElement }) {
 		const input = e.currentTarget.value;
 		urlInputError = ''
+		dlUrl = ''
 		if (input === '') {
 			return
 		}
 		try {
-			await processUrl(input)
+			dlUrl = await processUrl(input)
 		} catch(e) {
 			urlInputError = e.message
 		}
@@ -109,26 +104,31 @@
 </script>
 
 <main>
-	<GithubBanner url="https://github.com/fcjr/crxextract" />
+	<GithubBanner url='https://github.com/fcjr/crxextract' />
 	<h1>Drop a .crx or .xpi below to extract</h1>
 	<Dropzone
 		on:drop={handleFilesSelect}
 		multiple={false}
-		accept=".crx,.xpi"
+		accept='.crx,.xpi'
 		containerStyles='height: 100%; width: 100%; justify-content: center;'
 	>
 		<p>Drop a .crx or .xpi here to extract</p>
 	</Dropzone>
-	<p>... or paste a <a aria-label='Google Chrome Extension Store' href='https://chrome.google.com/webstore/category/extensions'>Chrome Store</a> / <a aria-label='Mozilla Addon Store' href='https://addons.mozilla.org/firefox/'>Mozilla Addon Store</a> address below:</p>
-	<input
-		class={ urlInputError ? 'urlInput error' : 'urlInput'}
-		placeholder="Paste a store url here to extract"
-		on:input={handleUrlInput}
-		on:change={() => {}}
-	/>
-	<p class="urlInputError">{urlInputError}</p>
-	<div class="footer">
-		<a href="https://frankchiarulli.com/">
+	<p>... or paste a <a aria-label='Google Chrome Extension Store' href='https://chrome.google.com/webstore/category/extensions'>Chrome Store</a> / <a aria-label='Mozilla Addon Store' href='https://addons.mozilla.org/firefox/'>Mozilla Addon Store</a> address below to download one:</p>
+	<div class='urlInputContainer'>
+		<input
+			class={ urlInputError ? 'urlInput error' : 'urlInput'}
+			placeholder='Paste a store url here to download a .crx or .xpi'
+			on:input={handleUrlInput}
+			on:change={() => {}}
+		/>
+		{#if dlUrl}
+			<a class='downloadButton' href={dlUrl} download>Download</a>
+		{/if}
+	</div>
+	<p class='urlInputError'>{urlInputError}</p>
+	<div class='footer'>
+		<a href='https://frankchiarulli.com/'>
 			Made with 💖 by <b>fcjr</b>
 		</a>
 	</div>
@@ -157,18 +157,21 @@
 		font-weight: 100;
 	}
 
+	.urlInputContainer {
+		display: flex;
+		width: 80%;
+	}
+
 	.urlInput {
-		width: 50%;
+		flex: 1;
 		padding: .8em;
 		border: solid;
 		border-width: .2em;
 		border-radius: 1em;
 		border-color: #8d8d8d;
-		-moz-outline-radius: 1em;
-
 	}
 	.urlInput.error:focus {
-			border-color: #ff3e00;
+		border-color: #ff3e00;
 	}
 
 	.urlInput:focus {
@@ -186,6 +189,20 @@
 	.urlInputError:after {
 		content: '.';
 		visibility: hidden;
+	}
+
+	.downloadButton {
+		padding: 1em;
+		border-radius: 1em;
+		margin-left: .5em;
+		background-color: #2196f3;
+		color: #fff;
+		font-size: .8em;
+		text-align: center;
+		text-decoration: none;
+	}
+	.downloadButton:visited {
+		color: #fff;
 	}
 
 	.footer {

@@ -1,8 +1,8 @@
 {
-  "name": "getcrx",
+  "name": "getaddonaccountid",
   "version": "1.0.0",
-  "description": "downloads the latest crx for the given extension id",
-  "main": "getcrx.js",
+  "description": "scraps a mozilla store page for the addons account id",
+  "main": "getaddonaccountid.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,6 +12,7 @@
     "js"
   ],
   "dependencies": {
+    "jsdom": "^16.5.1",
     "node-fetch": "^2.6.1"
   }
 }
