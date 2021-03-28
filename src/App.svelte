@@ -119,14 +119,14 @@
 	>
 		<p>Drop a .crx or .xpi here to extract</p>
 	</Dropzone>
-	<p>... or paste a <a aria-label='Google Chrome Extension Store' href='https://chrome.google.com/webstore/category/extensions'>Chrome Store</a> / <a aria-label='Mozilla Addon Store' href='https://addons.mozilla.org/firefox/'>Mozilla Addon Store</a> address below:</p>
+	<!-- <p>... or paste a <a aria-label='Google Chrome Extension Store' href='https://chrome.google.com/webstore/category/extensions'>Chrome Store</a> / <a aria-label='Mozilla Addon Store' href='https://addons.mozilla.org/firefox/'>Mozilla Addon Store</a> address below:</p>
 	<input
 		class={ urlInputError ? 'urlInput error' : 'urlInput'}
 		placeholder="Paste a store url here to extract"
 		on:input={handleUrlInput}
 		on:change={() => {}}
 	/>
-	<p class="urlInputError">{urlInputError}</p>
+	<p class="urlInputError">{urlInputError}</p> -->
 	<div class="footer">
 		<a href="https://frankchiarulli.com/">
 			Made with 💖 by <b>fcjr</b>
