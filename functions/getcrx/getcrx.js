@@ -6,22 +6,26 @@ function buildChromeDownloadLink(extensionId) {
 }
 
 exports.handler = async (event, context) => {
-	const id = event.queryStringParameters.id
-	if (id === '') {
-		return { statusCode: 500 }
-	}
-	const url = buildChromeDownloadLink(id)
-	console.log(url)
-	return fetch(url)
-	.then(res => res.buffer())
-	.then((body) => {
+	try {
+		const id = event.queryStringParameters.id
+		if (id === '') {
+			throw new Error('id required')
+		}
+		const url = buildChromeDownloadLink(id)
+		const response = await fetch(url)
+		if (!response.ok) {
+			throw new Error('failed to fetch crx')
+		}
+		const buf = await response.buffer()
 		return {
-		statusCode: 200,
-		headers: {
-			'Content-Type': 'application/octet-stream'
-		},
-		isBase64Encoded: true,
-		body: body.toString('base64')
-	}})
-	.catch((error) => ({ statusCode: 500, body: String(error) }))
+			statusCode: 200,
+			headers: {
+				'Content-Type': 'application/octet-stream'
+			},
+			isBase64Encoded: true,
+			body: buf.toString('base64')
+		}
+	} catch(error) {
+		return { statusCode: 500, body: String(error) }
+	}
 }
