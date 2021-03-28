@@ -75,19 +75,19 @@
 	async function processUrl(rawUrl: string) {
 		const eInfo = await getExtensionInfoFromUrl(rawUrl)
 		if (eInfo.type === 'chrome') {
-			const resp = await fetch(`api/getcrx?id=${encodeURIComponent(eInfo.id)}`)
+			const resp = await fetch(`/.netlify/functions/getcrx?id=${encodeURIComponent(eInfo.id)}`)
 			if (resp.status === 200) {
 				const blob = await resp.arrayBuffer()
 				processCrx(eInfo.id, new Uint8Array(blob))
 			} else {
-				throw Error('not a valid extension url')
+				throw Error('failed to fetch extension')
 			}
 		} else if (eInfo.type === 'mozilla') {
-			const resp = await fetch(`api/getxpi?url=${encodeURIComponent(rawUrl)}`)
+			const resp = await fetch(`/.netlify/functions/getxpi?url=${encodeURIComponent(rawUrl)}`)
 			if (resp.status === 200) {
 				processXpi(eInfo.id, await resp.arrayBuffer())
 			} else {
-				throw Error('not a valid addon url')
+				throw Error('failed to fetch addon')
 			}
 		}
 	}
