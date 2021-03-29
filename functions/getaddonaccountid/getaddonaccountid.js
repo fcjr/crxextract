@@ -12,14 +12,6 @@ exports.handler = async (event, context) => {
 			throw new Error('invalid url')
 		}
 
-		// get id
-		var path = storeUrl.pathname
-		if (path.slice(-1) == '/') {
-			path = path.slice(0, -1)
-		}
-		const pathParts = path.split('/')
-		const id = pathParts.pop()
-
 		// get account id
 		const storePage = await fetch(rawUrl)
 		const storeDom = new JSDOM(await storePage.text())
