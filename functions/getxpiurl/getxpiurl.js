@@ -15,9 +15,9 @@ exports.handler = async (event, context) => {
 		// get account id
 		const storePage = await fetch(rawUrl)
 		const storeDom = new JSDOM(await storePage.text())
-		const accountId = storeDom.window.document.querySelector('.AddonTitle-author a').textContent
+		const downloadUrl = storeDom.window.document.querySelector('.InstallButtonWrapper-download-link').href
 
-		return { statusCode: 200, body: accountId }
+		return { statusCode: 200, body: downloadUrl }
 	} catch(error) {
 		return { statusCode: 500, body: String(error) }
 	}

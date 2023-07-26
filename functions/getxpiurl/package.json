@@ -1,8 +1,8 @@
 {
-  "name": "getaddonaccountid",
+  "name": "getxpiurl",
   "version": "1.0.0",
-  "description": "scraps a mozilla store page for the addons account id",
-  "main": "getaddonaccountid.js",
+  "description": "scraps a mozilla store page for the addons download url",
+  "main": "getxpiurl.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
