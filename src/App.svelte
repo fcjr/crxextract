@@ -67,7 +67,7 @@
 		}
 		const pathParts = path.split('/')
 
-		if (url.hostname === 'chrome.google.com') {
+		if (url.hostname === 'chrome.google.com' || url.hostname === 'chromewebstore.google.com') {
 			return { type: 'chrome', id: pathParts.pop() }
 		} else if (url.hostname === 'addons.mozilla.org') {
 			return { type: 'mozilla', id: pathParts.pop() }
@@ -114,7 +114,7 @@
 	>
 		<p>Drop a .crx or .xpi here to extract</p>
 	</Dropzone>
-	<p>... or paste a <a aria-label='Google Chrome Extension Store' href='https://chrome.google.com/webstore/category/extensions'>Chrome Store</a> / <a aria-label='Mozilla Addon Store' href='https://addons.mozilla.org/firefox/'>Mozilla Addon Store</a> address below to download one:</p>
+	<p>... or paste a <a aria-label='Google Chrome Extension Store' href='https://chromewebstore.google.com/'>Chrome Store</a> / <a aria-label='Mozilla Addon Store' href='https://addons.mozilla.org/firefox/'>Mozilla Addon Store</a> address below to download one:</p>
 	<div class='urlInputContainer'>
 		<input
 			class={ urlInputError ? 'urlInput error' : 'urlInput'}
