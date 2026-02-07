@@ -1,4 +1,4 @@
-const { JSDOM } = require('jsdom')
+const { parseHTML } = require('linkedom')
 
 exports.handler = async (event, context) => {
 	try {
@@ -11,12 +11,14 @@ exports.handler = async (event, context) => {
 			throw new Error('invalid url')
 		}
 
-		// get account id
 		const storePage = await fetch(rawUrl)
-		const storeDom = new JSDOM(await storePage.text())
-		const downloadUrl = storeDom.window.document.querySelector('.InstallButtonWrapper-download-link').href
+		const { document } = parseHTML(await storePage.text())
+		const link = document.querySelector('.InstallButtonWrapper-download-link')
+		if (!link) {
+			throw new Error('download link not found')
+		}
 
-		return { statusCode: 200, body: downloadUrl }
+		return { statusCode: 200, body: link.getAttribute('href') }
 	} catch(error) {
 		return { statusCode: 500, body: String(error) }
 	}

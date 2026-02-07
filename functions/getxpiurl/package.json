@@ -12,6 +12,6 @@
     "js"
   ],
   "dependencies": {
-    "jsdom": "^25.0.0"
+    "linkedom": "^0.16.0"
   }
 }

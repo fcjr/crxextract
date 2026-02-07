@@ -78,7 +78,14 @@
 	async function processUrl(rawUrl: string) {
 		const eInfo = await getExtensionInfoFromUrl(rawUrl)
 		if (eInfo.type === 'chrome') {
-			return await getCrxUrl(eInfo.id)
+			const proxyPath = await getCrxUrl(eInfo.id)
+			const response = await fetch(proxyPath)
+			if (!response.ok) {
+				throw new Error('failed to download extension')
+			}
+			const data = new Uint8Array(await response.arrayBuffer())
+			processCrx(eInfo.id, data)
+			return ''
 		} else if (eInfo.type === 'mozilla') {
 			return await getXpiUrl(rawUrl, eInfo.id)
 		}
@@ -87,6 +94,7 @@
 
 	var urlInputError = ''
 	var dlUrl = ''
+	var downloading = false
 	async function handleUrlInput(e: Event & { currentTarget: EventTarget & HTMLInputElement }) {
 		const input = e.currentTarget.value;
 		urlInputError = ''
@@ -94,11 +102,13 @@
 		if (input === '') {
 			return
 		}
+		downloading = true
 		try {
 			dlUrl = await processUrl(input)
 		} catch(e) {
 			urlInputError = e.message
 		}
+		downloading = false
 	}
 
 </script>
@@ -122,7 +132,9 @@
 			on:input={handleUrlInput}
 			on:change={() => {}}
 		/>
-		{#if dlUrl}
+		{#if downloading}
+			<span class='downloadButton downloading'>Downloading...</span>
+		{:else if dlUrl}
 			<a class='downloadButton' href={dlUrl} download>Download</a>
 		{/if}
 	</div>
@@ -203,6 +215,10 @@
 	}
 	.downloadButton:visited {
 		color: #fff;
+	}
+	.downloadButton.downloading {
+		opacity: 0.7;
+		cursor: wait;
 	}
 
 	.footer {

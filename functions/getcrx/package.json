@@ -1,0 +1,6 @@
+{
+  "name": "getcrx",
+  "version": "1.0.0",
+  "description": "resolves chrome extension download url",
+  "main": "getcrx.js"
+}

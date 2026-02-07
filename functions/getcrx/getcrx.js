@@ -17,7 +17,10 @@ exports.handler = async (event, context) => {
 			throw new Error('no redirect location')
 		}
 
-		return { statusCode: 200, body: downloadUrl }
+		// Transform to same-origin proxy path so the browser can fetch it without CORS issues
+		const proxyPath = downloadUrl.replace('https://clients2.googleusercontent.com/', '/crxblob/')
+
+		return { statusCode: 200, body: proxyPath }
 	} catch (error) {
 		return { statusCode: 500, body: String(error) }
 	}
