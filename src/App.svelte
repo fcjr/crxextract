@@ -1,4 +1,4 @@
-<script type='ts'>
+<script lang="ts">
 	import Dropzone from 'svelte-file-dropzone'
 	import FileSaver from 'file-saver'
 

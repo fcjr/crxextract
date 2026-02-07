@@ -1,4 +1,3 @@
-const fetch = require('node-fetch')
 const { JSDOM } = require('jsdom')
 
 exports.handler = async (event, context) => {
