@@ -34,11 +34,16 @@
 	}
 
 	.github-corner-svg {
-		fill:#151513;
-		color:#fff;
+		fill: #1c1c1e;
+		color: #888;
 		position: absolute;
 		top: 0;
 		border: 0;
 		right: 0;
+		transition: color 0.2s;
+	}
+
+	.github-corner-svg:hover {
+		color: #ededed;
 	}
 </style>

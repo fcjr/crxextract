@@ -123,32 +123,50 @@
 
 <main>
 	<GithubBanner url='https://github.com/fcjr/crxextract' />
-	<h1>Drop a .crx or .xpi below to extract</h1>
-	<Dropzone
-		on:drop={handleFilesSelect}
-		multiple={false}
-		accept='.crx,.xpi'
-		containerStyles='height: 100%; width: 100%; justify-content: center;'
-	>
-		<p>Drop a .crx or .xpi here to extract</p>
-	</Dropzone>
-	<p>... or paste a <a aria-label='Google Chrome Extension Store' href='https://chromewebstore.google.com/'>Chrome Store</a> / <a aria-label='Mozilla Addon Store' href='https://addons.mozilla.org/firefox/'>Mozilla Addon Store</a> address below to download one:</p>
-	<div class='urlInputContainer'>
-		<input
-			class={ urlInputError ? 'urlInput error' : 'urlInput'}
-			placeholder='Paste a store url here to download a .crx or .xpi'
-			on:input={handleUrlInput}
-			on:change={() => {}}
-		/>
-		{#if downloading}
-			<button class='downloadButton' disabled>Downloading...</button>
-		{:else if crxProxyPath}
-			<button class='downloadButton' on:click={handleCrxDownload}>Download</button>
-		{:else if dlUrl}
-			<button class='downloadButton' on:click={() => window.open(dlUrl, '_blank')}>Download</button>
-		{/if}
+
+	<div class="hero">
+		<h1>crxextract</h1>
+		<p class="subtitle">Extract Chrome and Firefox extensions in seconds.</p>
 	</div>
-	<p class='urlInputError'>{urlInputError}</p>
+
+	<div class="card">
+		<Dropzone
+			on:drop={handleFilesSelect}
+			multiple={false}
+			accept='.crx,.xpi'
+			disableDefaultStyles={true}
+			containerStyles='width: 100%; display: flex; align-items: center; justify-content: center; border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px; background: rgba(255,255,255,0.02); cursor: pointer; transition: background 0.15s, border-color 0.15s; padding: 2.5rem 1rem;'
+		>
+			<p class="dropLabel">Drop a <code>.crx</code> or <code>.xpi</code> file here</p>
+		</Dropzone>
+	</div>
+
+	<div class="divider">
+		<span class="dividerLine"></span>
+		<span class="dividerText">or</span>
+		<span class="dividerLine"></span>
+	</div>
+
+	<div class="card">
+		<p class="inputLabel">Paste a <a href='https://chromewebstore.google.com/'>Chrome Web Store</a> or <a href='https://addons.mozilla.org/firefox/'>Mozilla Add-on</a> URL</p>
+		<div class='urlInputContainer'>
+			<input
+				class={ urlInputError ? 'urlInput error' : 'urlInput'}
+				placeholder='https://chromewebstore.google.com/detail/...'
+				on:input={handleUrlInput}
+				on:change={() => {}}
+			/>
+			{#if downloading}
+				<button class='downloadButton' disabled>Downloading...</button>
+			{:else if crxProxyPath}
+				<button class='downloadButton' on:click={handleCrxDownload}>Download</button>
+			{:else if dlUrl}
+				<button class='downloadButton' on:click={() => window.open(dlUrl, '_blank')}>Download</button>
+			{/if}
+		</div>
+		<p class='urlInputError'>{urlInputError}</p>
+	</div>
+
 	<div class='footer'>
 		<a href='https://frankchiarulli.com/'>
 			Made with 💖 by <b>fcjr</b>
@@ -158,55 +176,134 @@
 
 <style>
 	main {
-		height: 95%;
-		margin: 0 10% 0 10%;
+		min-height: 100vh;
+		max-width: 560px;
+		margin: 0 auto;
+		padding: 3rem 1.5rem;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
+	}
+
+	.hero {
 		text-align: center;
+		margin-bottom: 2.5rem;
+	}
+
+	h1 {
+		font-size: 2rem;
+		font-weight: 600;
+		letter-spacing: -0.03em;
+		color: #ededed;
+		margin: 0 0 0.5rem 0;
+	}
+
+	.subtitle {
+		color: #888;
+		font-size: 1rem;
+		margin: 0;
+	}
+
+	.card {
+		width: 100%;
+		background: #141415;
+		border: 1px solid rgba(255, 255, 255, 0.06);
+		border-radius: 12px;
+		padding: 1.25rem;
+	}
+
+	.dropLabel {
+		color: #666;
+		margin: 0;
+		font-size: 0.9rem;
+	}
+
+	.dropLabel :global(code) {
+		background: rgba(255, 255, 255, 0.06);
+		padding: 0.15em 0.4em;
+		border-radius: 4px;
+		font-size: 0.85em;
+		color: #999;
+	}
+
+	.divider {
+		display: flex;
+		align-items: center;
+		width: 100%;
+		gap: 1rem;
+		margin: 1.25rem 0;
+	}
+
+	.dividerLine {
+		flex: 1;
+		height: 1px;
+		background: rgba(255, 255, 255, 0.06);
+	}
+
+	.dividerText {
+		color: #555;
+		font-size: 0.8rem;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.inputLabel {
+		color: #888;
+		font-size: 0.85rem;
+		margin: 0 0 0.75rem 0;
 	}
 
 	a,
 	a:visited {
-		color: inherit;
+		color: #ededed;
+		text-decoration-color: rgba(255, 255, 255, 0.2);
+		text-underline-offset: 2px;
+		transition: text-decoration-color 0.15s;
 	}
 
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 2em;
-		font-weight: 100;
+	a:hover {
+		text-decoration-color: rgba(255, 255, 255, 0.6);
 	}
 
 	.urlInputContainer {
 		display: flex;
-		width: 80%;
+		width: 100%;
+		gap: 0.5rem;
 	}
 
 	.urlInput {
 		flex: 1;
-		padding: .8em;
-		border: solid;
-		border-width: .2em;
-		border-radius: 1em;
-		border-color: #8d8d8d;
+		padding: 0.6rem 0.75rem;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.03);
+		color: #ededed;
+		font-family: inherit;
+		font-size: 0.875rem;
+		transition: border-color 0.15s;
 	}
-	.urlInput.error:focus {
-		border-color: #ff3e00;
+
+	.urlInput::placeholder {
+		color: #555;
 	}
 
 	.urlInput:focus {
 		outline: none;
-		border-color: #2196f3;
+		border-color: #6366f1;
 	}
+
+	.urlInput.error:focus {
+		border-color: #ef4444;
+	}
+
 	.urlInputError {
 		margin: 0;
-		margin-top: .8em;
-		font-size: .8em;
-		color: #ff3e00;
-		text-align: center;
+		margin-top: 0.5rem;
+		font-size: 0.8rem;
+		color: #ef4444;
 	}
+
 	.urlInputError:before,
 	.urlInputError:after {
 		content: '.';
@@ -214,41 +311,45 @@
 	}
 
 	.downloadButton {
-		padding: 1em;
-		border-radius: 1em;
-		margin-left: .5em;
-		background-color: #2196f3;
-		color: #fff;
-		font-size: .8em;
-		text-align: center;
-		text-decoration: none;
+		padding: 0.6rem 1rem;
+		border-radius: 8px;
+		background: #ededed;
+		color: #0a0a0b;
+		font-size: 0.875rem;
+		font-weight: 500;
+		font-family: inherit;
 		border: none;
 		cursor: pointer;
+		white-space: nowrap;
+		transition: background 0.15s;
 	}
+
+	.downloadButton:hover {
+		background: #fff;
+	}
+
+	.downloadButton:active {
+		background: #d4d4d4;
+	}
+
 	.downloadButton:disabled {
-		opacity: 0.7;
+		opacity: 0.4;
 		cursor: wait;
 	}
 
 	.footer {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
+		margin-top: 3rem;
 	}
 
-	.footer a {
-		top: 0;
-		position: relative;
-		padding-top: 1em;
-		color: #3b3b3b;
+	.footer a,
+	.footer a:visited {
+		color: #555;
 		text-decoration: none;
-		transition: top ease 0.5s;
+		font-size: 0.8rem;
+		transition: color 0.15s;
 	}
 
-	.footer a:hover,
-	.footer a:focus,
-	.footer a:active {
-		top: -5px;
-		text-decoration: underline;
+	.footer a:hover {
+		color: #888;
 	}
 </style>
