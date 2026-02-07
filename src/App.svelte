@@ -78,7 +78,7 @@
 	async function processUrl(rawUrl: string) {
 		const eInfo = await getExtensionInfoFromUrl(rawUrl)
 		if (eInfo.type === 'chrome') {
-			return getCrxUrl(eInfo.id)
+			return await getCrxUrl(eInfo.id)
 		} else if (eInfo.type === 'mozilla') {
 			return await getXpiUrl(rawUrl, eInfo.id)
 		}
