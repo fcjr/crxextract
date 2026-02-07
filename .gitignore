@@ -1,8 +1,8 @@
 node_modules
-/public/build/
+/.svelte-kit
+/build
 
 .DS_Store
 
-# Local Netlify folder
-.netlify
-deno.lock
+# Local Vercel folder
+.vercel

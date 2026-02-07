@@ -2,10 +2,10 @@
 	import Dropzone from 'svelte-file-dropzone'
 	import FileSaver from 'file-saver'
 
-	import getCrxUrl from './utils/getCrxUrl'
-	import getXpiUrl from './utils/getXpiUrl'
+	import getCrxUrl from '$lib/utils/getCrxUrl'
+	import getXpiUrl from '$lib/utils/getXpiUrl'
 
-	import GithubBanner from './components/GithubBanner.svelte'
+	import GithubBanner from '$lib/components/GithubBanner.svelte'
 
 	function uint32FromUint8Array(data: Uint8Array) {
 		let dataview = new DataView(data.buffer)
@@ -75,11 +75,11 @@
 		throw new Error('not a valid chrome or mozilla store link')
 	}
 
-	var urlInputError = ''
-	var dlUrl = ''
-	var crxProxyPath = ''
-	var crxId = ''
-	var downloading = false
+	let urlInputError = $state('')
+	let dlUrl = $state('')
+	let crxProxyPath = $state('')
+	let crxId = $state('')
+	let downloading = $state(false)
 
 	async function handleUrlInput(e: Event & { currentTarget: EventTarget & HTMLInputElement }) {
 		const input = e.currentTarget.value;
@@ -153,15 +153,15 @@
 			<input
 				class={ urlInputError ? 'urlInput error' : 'urlInput'}
 				placeholder='https://chromewebstore.google.com/detail/...'
-				on:input={handleUrlInput}
-				on:change={() => {}}
+				oninput={handleUrlInput}
+				onchange={() => {}}
 			/>
 			{#if downloading}
 				<button class='downloadButton' disabled>Downloading...</button>
 			{:else if crxProxyPath}
-				<button class='downloadButton' on:click={handleCrxDownload}>Download</button>
+				<button class='downloadButton' onclick={handleCrxDownload}>Download</button>
 			{:else if dlUrl}
-				<button class='downloadButton' on:click={() => window.open(dlUrl, '_blank')}>Download</button>
+				<button class='downloadButton' onclick={() => window.open(dlUrl, '_blank')}>Download</button>
 			{/if}
 		</div>
 		<p class='urlInputError'>{urlInputError}</p>

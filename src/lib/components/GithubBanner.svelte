@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let url: string
+	let { url }: { url: string } = $props()
 </script>
 
 <a href={url} class="github-corner" aria-label="View source on GitHub">
