@@ -75,36 +75,44 @@
 		throw new Error('not a valid chrome or mozilla store link')
 	}
 
-	async function processUrl(rawUrl: string) {
-		const eInfo = await getExtensionInfoFromUrl(rawUrl)
-		if (eInfo.type === 'chrome') {
-			const proxyPath = await getCrxUrl(eInfo.id)
-			const response = await fetch(proxyPath)
-			if (!response.ok) {
-				throw new Error('failed to download extension')
-			}
-			const data = new Uint8Array(await response.arrayBuffer())
-			processCrx(eInfo.id, data)
-			return ''
-		} else if (eInfo.type === 'mozilla') {
-			return await getXpiUrl(rawUrl, eInfo.id)
-		}
-		return ''
-	}
-
 	var urlInputError = ''
 	var dlUrl = ''
+	var crxProxyPath = ''
+	var crxId = ''
 	var downloading = false
+
 	async function handleUrlInput(e: Event & { currentTarget: EventTarget & HTMLInputElement }) {
 		const input = e.currentTarget.value;
 		urlInputError = ''
 		dlUrl = ''
+		crxProxyPath = ''
+		crxId = ''
 		if (input === '') {
 			return
 		}
-		downloading = true
 		try {
-			dlUrl = await processUrl(input)
+			const eInfo = await getExtensionInfoFromUrl(input)
+			if (eInfo.type === 'chrome') {
+				crxProxyPath = await getCrxUrl(eInfo.id)
+				crxId = eInfo.id
+			} else if (eInfo.type === 'mozilla') {
+				dlUrl = await getXpiUrl(input, eInfo.id)
+			}
+		} catch(e) {
+			urlInputError = e.message
+		}
+	}
+
+	async function handleCrxDownload() {
+		downloading = true
+		urlInputError = ''
+		try {
+			const response = await fetch(crxProxyPath)
+			if (!response.ok) {
+				throw new Error('failed to download extension')
+			}
+			const data = new Uint8Array(await response.arrayBuffer())
+			processCrx(crxId, data)
 		} catch(e) {
 			urlInputError = e.message
 		}
@@ -133,9 +141,11 @@
 			on:change={() => {}}
 		/>
 		{#if downloading}
-			<span class='downloadButton downloading'>Downloading...</span>
+			<button class='downloadButton' disabled>Downloading...</button>
+		{:else if crxProxyPath}
+			<button class='downloadButton' on:click={handleCrxDownload}>Download</button>
 		{:else if dlUrl}
-			<a class='downloadButton' href={dlUrl} download>Download</a>
+			<button class='downloadButton' on:click={() => window.open(dlUrl, '_blank')}>Download</button>
 		{/if}
 	</div>
 	<p class='urlInputError'>{urlInputError}</p>
@@ -212,11 +222,10 @@
 		font-size: .8em;
 		text-align: center;
 		text-decoration: none;
+		border: none;
+		cursor: pointer;
 	}
-	.downloadButton:visited {
-		color: #fff;
-	}
-	.downloadButton.downloading {
+	.downloadButton:disabled {
 		opacity: 0.7;
 		cursor: wait;
 	}
