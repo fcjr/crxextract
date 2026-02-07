@@ -111,8 +111,9 @@
 			if (!response.ok) {
 				throw new Error('failed to download extension')
 			}
-			const data = new Uint8Array(await response.arrayBuffer())
-			processCrx(crxId, data)
+			const data = await response.arrayBuffer()
+			const blob = new Blob([data], {type: 'application/x-chrome-extension'})
+			FileSaver.saveAs(blob, crxId + '.crx')
 		} catch(e) {
 			urlInputError = e.message
 		}
@@ -129,42 +130,50 @@
 		<p class="subtitle">Extract Chrome and Firefox extensions in seconds.</p>
 	</div>
 
-	<div class="card">
-		<Dropzone
-			on:drop={handleFilesSelect}
-			multiple={false}
-			accept='.crx,.xpi'
-			disableDefaultStyles={true}
-			containerStyles='width: 100%; display: flex; align-items: center; justify-content: center; border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px; background: rgba(255,255,255,0.02); cursor: pointer; transition: background 0.15s, border-color 0.15s; padding: 2.5rem 1rem;'
-		>
-			<p class="dropLabel">Drop a <code>.crx</code> or <code>.xpi</code> file here</p>
-		</Dropzone>
-	</div>
-
-	<div class="divider">
-		<span class="dividerLine"></span>
-		<span class="dividerText">or</span>
-		<span class="dividerLine"></span>
-	</div>
-
-	<div class="card">
-		<p class="inputLabel">Paste a <a href='https://chromewebstore.google.com/'>Chrome Web Store</a> or <a href='https://addons.mozilla.org/firefox/'>Mozilla Add-on</a> URL</p>
-		<div class='urlInputContainer'>
-			<input
-				class={ urlInputError ? 'urlInput error' : 'urlInput'}
-				placeholder='https://chromewebstore.google.com/detail/...'
-				oninput={handleUrlInput}
-				onchange={() => {}}
-			/>
-			{#if downloading}
-				<button class='downloadButton' disabled>Downloading...</button>
-			{:else if crxProxyPath}
-				<button class='downloadButton' onclick={handleCrxDownload}>Download</button>
-			{:else if dlUrl}
-				<button class='downloadButton' onclick={() => window.open(dlUrl, '_blank')}>Download</button>
-			{/if}
+	<div class="step">
+		<div class="stepHeader">
+			<span class="stepNumber">1</span>
+			<h2 class="stepTitle">Acquire an extension</h2>
 		</div>
-		<p class='urlInputError'>{urlInputError}</p>
+		<div class="card">
+			<p class="inputLabel">Paste a <a href='https://chromewebstore.google.com/'>Chrome Web Store</a> or <a href='https://addons.mozilla.org/firefox/'>Mozilla Add-on</a> URL to download the extension file</p>
+			<div class='urlInputContainer'>
+				<input
+					class={ urlInputError ? 'urlInput error' : 'urlInput'}
+					placeholder='https://chromewebstore.google.com/detail/...'
+					oninput={handleUrlInput}
+					onchange={() => {}}
+				/>
+				{#if downloading}
+					<button class='downloadButton' disabled>Downloading...</button>
+				{:else if crxProxyPath}
+					<button class='downloadButton' onclick={handleCrxDownload}>Download</button>
+				{:else if dlUrl}
+					<button class='downloadButton' onclick={() => window.open(dlUrl, '_blank')}>Download</button>
+				{/if}
+			</div>
+			<p class='urlInputError'>{urlInputError}</p>
+			<p class="stepHint">Already have a <code>.crx</code> or <code>.xpi</code> file? Skip to step 2.</p>
+		</div>
+	</div>
+
+	<div class="step">
+		<div class="stepHeader">
+			<span class="stepNumber">2</span>
+			<h2 class="stepTitle">Extract to ZIP</h2>
+		</div>
+		<div class="card">
+			<Dropzone
+				on:drop={handleFilesSelect}
+				multiple={false}
+				accept='.crx,.xpi'
+				disableDefaultStyles={true}
+				containerStyles='width: 100%; display: flex; align-items: center; justify-content: center; border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px; background: rgba(255,255,255,0.02); cursor: pointer; transition: background 0.15s, border-color 0.15s; padding: 2.5rem 1rem;'
+			>
+				<p class="dropLabel">Drop a <code>.crx</code> or <code>.xpi</code> file here to extract it</p>
+			</Dropzone>
+			<p class="stepHint">All processing happens locally in your browser.</p>
+		</div>
 	</div>
 
 	<div class='footer'>
@@ -227,25 +236,51 @@
 		color: #999;
 	}
 
-	.divider {
+	.step {
+		width: 100%;
+		margin-bottom: 2rem;
+	}
+
+	.stepHeader {
 		display: flex;
 		align-items: center;
-		width: 100%;
-		gap: 1rem;
-		margin: 1.25rem 0;
+		gap: 0.75rem;
+		margin-bottom: 0.75rem;
 	}
 
-	.dividerLine {
-		flex: 1;
-		height: 1px;
+	.stepNumber {
+		width: 1.5rem;
+		height: 1.5rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
 		background: rgba(255, 255, 255, 0.06);
+		color: #888;
+		font-size: 0.75rem;
+		font-weight: 600;
+		flex-shrink: 0;
 	}
 
-	.dividerText {
+	.stepTitle {
+		color: #ededed;
+		font-size: 0.95rem;
+		font-weight: 500;
+		margin: 0;
+	}
+
+	.stepHint {
 		color: #555;
 		font-size: 0.8rem;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		margin: 0.75rem 0 0 0;
+	}
+
+	.stepHint :global(code) {
+		background: rgba(255, 255, 255, 0.06);
+		padding: 0.15em 0.4em;
+		border-radius: 4px;
+		font-size: 0.85em;
+		color: #999;
 	}
 
 	.inputLabel {
