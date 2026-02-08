@@ -31,3 +31,8 @@ div[role="button"]:focus {
 	outline: none;
 	border-color: #6366f1 !important;
 }
+
+::selection {
+	background: #8b5cf6;
+	color: #fff;
+}
